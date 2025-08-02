@@ -1,0 +1,10 @@
+
+# Planka Task Checker - Run every hour
+# This crontab entry runs the sync and run script every hour at minute 0
+0 * * * * cd /path/to/your/project && ./run_sync.sh >> /var/log/planka_task_checker.log 2>&1
+
+# Alternative: Run every hour at a specific minute (e.g., 15 minutes past the hour)
+# 15 * * * * cd /path/to/your/project && ./run_sync.sh >> /var/log/planka_task_checker.log 2>&1
+
+# Alternative: Run every 2 hours (recommended in README)
+# 0 */2 * * * cd /path/to/your/project && ./run_sync.sh >> /var/log/planka_task_checker.log 2>&1
