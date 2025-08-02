@@ -1,7 +1,7 @@
 
 from plankapy import Planka, PasswordAuth
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 import logging
 import os
@@ -52,12 +52,13 @@ try:
     webhook_url = f"{config['home_assistant']['url']}/api/webhook/{config['home_assistant']['webhook_id']}"
     logger.debug(f"Webhook URL configured: {webhook_url}")
 
-    # Get today's date
+    # Get today's date and the date 3 days from now
     today = datetime.now(timezone.utc).date()
-    logger.info(f"Checking for tasks due on: {today}")
+    three_days_from_now = datetime.now(timezone.utc).date() + timedelta(days=3)
+    logger.info(f"Checking for tasks due between: {today} and {three_days_from_now}")
 
-    # List all cards with their due dates and check for today's tasks
-    cards_due_today = []
+    # List all cards with their due dates and check for tasks due in next 3 days
+    cards_due_soon = []
 
     for project in planka.projects:
         logger.debug(f"Processing project: {project.name}")
@@ -73,45 +74,58 @@ try:
 
                         logger.debug(f"      Card: {card.name} - Due: {card.dueDate}")
 
-                        # Check if due date is today
-                        if due_date_only == today:
+                        # Check if due date is within the next 3 days
+                        if today <= due_date_only <= three_days_from_now:
                             # Construct card URL
                             card_url = f"{config['planka']['url']}/cards/{card.id}"
 
                             # Format due date for webhook payload
                             formatted_due_date = due_date.strftime("%m/%d/%Y at %I:%M %p")
 
-                            cards_due_today.append({
+                            # Calculate days until due
+                            days_until_due = (due_date_only - today).days
+                            if days_until_due == 0:
+                                due_status = "today"
+                            elif days_until_due == 1:
+                                due_status = "tomorrow"
+                            else:
+                                due_status = f"in {days_until_due} days"
+
+                            cards_due_soon.append({
                                 "taskname": card.name,
                                 "due_date": formatted_due_date,
-                                "card_url": card_url
+                                "card_url": card_url,
+                                "days_until_due": days_until_due,
+                                "due_status": due_status
                             })
-                            logger.info(f"Found task due today: {card.name}")
+                            logger.info(f"Found task due {due_status}: {card.name}")
                     else:
                         logger.debug(f"      Card: {card.name} - No due date")
 
-    # Send webhook for cards due today
-    if cards_due_today:
-        logger.info(f"Found {len(cards_due_today)} card(s) due today. Sending webhooks...")
+    # Send webhook for cards due in the next 3 days
+    if cards_due_soon:
+        logger.info(f"Found {len(cards_due_soon)} card(s) due in the next 3 days. Sending webhooks...")
 
-        for card_info in cards_due_today:
+        for card_info in cards_due_soon:
             payload = {
                 "taskname": card_info["taskname"],
                 "due_date": card_info["due_date"],
-                "card_url": card_info["card_url"]
+                "card_url": card_info["card_url"],
+                "days_until_due": card_info["days_until_due"],
+                "due_status": card_info["due_status"]
             }
 
             try:
-                logger.debug(f"Sending webhook for task: {card_info['taskname']}")
+                logger.debug(f"Sending webhook for task: {card_info['taskname']} ({card_info['due_status']})")
                 response = requests.post(webhook_url, json=payload, timeout=10)
                 if response.status_code == 200:
-                    logger.info(f"✅ Webhook sent successfully for: {card_info['taskname']}")
+                    logger.info(f"✅ Webhook sent successfully for: {card_info['taskname']} (due {card_info['due_status']})")
                 else:
                     logger.error(f"❌ Webhook failed for {card_info['taskname']}: HTTP {response.status_code}")
             except requests.exceptions.RequestException as e:
                 logger.error(f"❌ Error sending webhook for {card_info['taskname']}: {e}")
     else:
-        logger.info("No cards due today")
+        logger.info("No cards due in the next 3 days")
 
     logger.info("Task checker completed successfully")
 

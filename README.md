@@ -6,7 +6,7 @@ A Python script that monitors your Planka kanban boards for tasks due today and 
 ## Features
 
 - 🔍 Monitors all Planka projects and boards for tasks with due dates
-- 📅 Identifies tasks due on the current date
+- 📅 Identifies tasks due within the next 3 days
 - 🏠 Sends webhook notifications to Home Assistant with task details
 - 📊 Comprehensive logging with configurable levels
 - ⚙️ Environment-based configuration for security
@@ -66,7 +66,9 @@ The webhook will receive this payload:
 {
   "taskname": "Task Name",
   "due_date": "08/02/2025 at 03:30 PM",
-  "card_url": "https://your-planka-instance.com/cards/card-id"
+  "card_url": "https://your-planka-instance.com/cards/card-id",
+  "days_until_due": 1,
+  "due_status": "tomorrow"
 }
 ```
 
@@ -126,10 +128,12 @@ Set the `LOG_LEVEL` environment variable to control verbosity.
 
 ## Webhook Payload
 
-Each task due today will trigger a webhook with:
+Each task due within the next 3 days will trigger a webhook with:
 - `taskname`: Name of the task/card
 - `due_date`: Formatted due date (MM/DD/YYYY at HH:MM AM/PM)
 - `card_url`: Direct link to the card in Planka
+- `days_until_due`: Number of days until the task is due (0 for today, 1 for tomorrow, etc.)
+- `due_status`: Human-readable due status ("today", "tomorrow", or "in X days")
 
 ## Security Notes
 
@@ -144,7 +148,7 @@ Each task due today will trigger a webhook with:
 
 1. **Authentication Failed**: Check your Planka credentials in `.env`
 2. **Webhook Not Received**: Verify Home Assistant URL and webhook ID
-3. **No Tasks Found**: Ensure tasks have due dates set in Planka
+3. **No Tasks Found**: Ensure tasks have due dates set within the next 3 days in Planka
 4. **Date/Time Issues**: Script uses UTC timezone for date comparisons
 
 ### Debug Mode
