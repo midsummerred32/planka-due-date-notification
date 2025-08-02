@@ -31,17 +31,44 @@ else
     STASHED=false
 fi
 
-# Pull latest changes
-echo "⬇️  Pulling latest changes from origin/$CURRENT_BRANCH..."
-if git pull origin "$CURRENT_BRANCH"; then
-    echo "✅ Successfully synced with GitHub"
-else
-    echo "❌ Failed to pull changes from GitHub"
-    if [ "$STASHED" = true ]; then
-        echo "🔄 Restoring your stashed changes..."
-        git stash pop
+# Check if there are any changes to pull
+CHANGES_AVAILABLE=$(git rev-list HEAD...origin/$CURRENT_BRANCH --count)
+
+if [ "$CHANGES_AVAILABLE" -gt 0 ]; then
+    echo "🔄 Found $CHANGES_AVAILABLE new commit(s) on GitHub"
+    
+    # Pull latest changes
+    echo "⬇️  Pulling latest changes from origin/$CURRENT_BRANCH..."
+    if git pull origin "$CURRENT_BRANCH"; then
+        echo "✅ Successfully synced with GitHub"
+        echo ""
+        echo "🚨 IMPORTANT: New changes have been pulled from GitHub!"
+        echo "   Please rerun this script to ensure you're using the latest version:"
+        echo "   ./run_sync.sh"
+        echo ""
+        
+        # Restore stashed changes if any
+        if [ "$STASHED" = true ]; then
+            echo "🔄 Restoring your stashed changes..."
+            if git stash pop; then
+                echo "✅ Stashed changes restored successfully"
+            else
+                echo "⚠️  Warning: Could not restore stashed changes automatically"
+                echo "   Run 'git stash list' and 'git stash pop' manually if needed"
+            fi
+        fi
+        
+        exit 2  # Exit with code 2 to indicate updates were pulled
+    else
+        echo "❌ Failed to pull changes from GitHub"
+        if [ "$STASHED" = true ]; then
+            echo "🔄 Restoring your stashed changes..."
+            git stash pop
+        fi
+        exit 1
     fi
-    exit 1
+else
+    echo "✅ Already up to date with GitHub"
 fi
 
 # Restore stashed changes if any
