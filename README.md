@@ -1,4 +1,3 @@
-
 # Planka Task Checker for Home Assistant
 
 A Python script that monitors your Planka kanban boards for tasks due today and sends notifications to Home Assistant via webhooks.
@@ -71,6 +70,23 @@ The webhook will receive this payload:
   "due_status": "tomorrow"
 }
 ```
+
+#### Quick Setup with Blueprint
+
+This repository includes a Home Assistant blueprint (`home_assistant_automation.yaml`) for easy setup:
+
+**Method 1: Import Blueprint**
+1. Copy the contents of `home_assistant_automation.yaml`
+2. In Home Assistant, go to **Settings** → **Blueprints**
+3. Click **Import Blueprint** and paste the YAML content
+4. Create a new automation using the blueprint
+5. Fill in your webhook ID and notification target
+
+**Method 2: Direct Automation Import**
+1. Go to **Settings** → **Automations & Scenes**
+2. Click **⋮** menu → **Import automation**
+3. Paste the blueprint YAML content
+4. Configure the required inputs
 
 ## Usage
 

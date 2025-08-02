@@ -1,0 +1,57 @@
+
+blueprint:
+  name: Planka Task Due Notifications
+  description: Send notifications when Planka tasks are due soon via webhook
+  domain: automation
+  input:
+    webhook_id:
+      name: Webhook ID
+      description: The webhook ID that your Planka script will send data to
+      selector:
+        text:
+    notification_target:
+      name: Notification Target
+      description: The device or service to send notifications to
+      default: notify.mobile_app_your_device
+      selector:
+        text:
+    notification_title:
+      name: Notification Title Template (Optional)
+      description: Custom title template for notifications
+      default: "Task due on {{ trigger.json.due_date}}!"
+      selector:
+        text:
+          multiline: false
+    notification_message:
+      name: Notification Message Template (Optional)
+      description: Custom message template for notifications
+      default: "The task, {{ trigger.json.taskname}}, is due {{ trigger.json.due_status }}!"
+      selector:
+        text:
+          multiline: false
+
+alias: Planka Task Due Notifications
+description: Automatically created from blueprint
+triggers:
+  - allowed_methods:
+      - POST
+      - PUT
+    local_only: false
+    webhook_id: !input webhook_id
+    trigger: webhook
+conditions: []
+actions:
+  - data:
+      message: !input notification_message
+      title: !input notification_title
+      data:
+        actions:
+          - action: URI
+            title: Open Task
+            uri: "{{ trigger.json.card_url }}"
+            icon: mdi:check-all
+            data:
+              ttl: 0
+              priority: high
+    action: !input notification_target
+mode: single
