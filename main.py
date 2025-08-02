@@ -36,9 +36,13 @@ for project in planka.projects:
                     
                     # Check if due date is today
                     if due_date_only == today:
+                        # Construct card URL
+                        card_url = f"https://planka.midsummerred32.com/boards/{board.id}/cards/{card.id}"
+                        
                         cards_due_today.append({
                             "taskname": card.name,
-                            "due_date": card.dueDate
+                            "due_date": card.dueDate,
+                            "card_url": card_url
                         })
                         print(f"        *** DUE TODAY! ***")
                 else:
@@ -51,7 +55,8 @@ if cards_due_today:
     for card_info in cards_due_today:
         payload = {
             "taskname": card_info["taskname"],
-            "due_date": card_info["due_date"]
+            "due_date": card_info["due_date"],
+            "card_url": card_info["card_url"]
         }
         
         try:
