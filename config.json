@@ -1,12 +1,12 @@
 
 {
   "planka": {
-    "url": "https://planka.midsummerred32.com",
-    "username": "midsummerred32",
-    "password": "NintendoGamer08!"
+    "url": "${PLANKA_URL}",
+    "username": "${PLANKA_USERNAME}",
+    "password": "${PLANKA_PASSWORD}"
   },
   "home_assistant": {
-    "url": "https://home.midsummerred32.com",
-    "webhook_id": "-N9Bcq6asoHOyUpdb8mv0w1_o"
+    "url": "${HOME_ASSISTANT_URL}",
+    "webhook_id": "${WEBHOOK_ID}"
   }
 }
