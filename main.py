@@ -57,6 +57,11 @@ try:
     three_days_from_now = datetime.now(timezone.utc).date() + timedelta(days=3)
     logger.info(f"Checking for tasks due between: {today} and {three_days_from_now}")
 
+    # Parse done list names from config (case-insensitive)
+    done_lists_config = config.get('done_lists', 'Done,Completed,Finished')
+    done_lists = [name.strip().lower() for name in done_lists_config.split(',') if name.strip()]
+    logger.info(f"Excluding cards from these lists: {done_lists}")
+
     # List all cards with their due dates and check for tasks due in next 3 days
     cards_due_soon = []
 
@@ -66,6 +71,12 @@ try:
             logger.debug(f"  Processing board: {board.name}")
             for list_item in board.lists:
                 logger.debug(f"    Processing list: {list_item.name}")
+                
+                # Skip lists that are marked as "done"
+                if list_item.name.lower() in done_lists:
+                    logger.debug(f"    Skipping done list: {list_item.name}")
+                    continue
+                
                 for card in list_item.cards:
                     if hasattr(card, 'dueDate') and card.dueDate:
                         # Parse the due date

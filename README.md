@@ -36,6 +36,11 @@ WEBHOOK_ID=your_webhook_id
 
 # Logging Configuration (optional)
 LOG_LEVEL=INFO
+
+# Done List Configuration (optional)
+# Comma-separated list of list names to exclude from notifications
+# Case-insensitive matching
+DONE_LISTS=Done,Completed,Finished
 ```
 
 ### 2. Install Dependencies

@@ -8,5 +8,6 @@
   "home_assistant": {
     "url": "${HOME_ASSISTANT_URL}",
     "webhook_id": "${WEBHOOK_ID}"
-  }
+  },
+  "done_lists": "${DONE_LISTS}"
 }
