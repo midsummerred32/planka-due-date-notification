@@ -2,6 +2,21 @@ version = 1
 requires-python = ">=3.11"
 
 [[package]]
+name = "plankapy"
+version = "2.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9b/57/29987afb2f9862b627a38648ee899e754b05de998cec386e1ca467f6efbd/plankapy-2.2.2.tar.gz", hash = "sha256:bd832f97f9e63e651946b4d1410ceb96c7cee1732cdddfe796ed60bf6404b6f3", size = 46442 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/25/bd/e99f0185fe426186e57cdfee3e84ca863aec91e40b6209bff55045a42537/plankapy-2.2.2-py3-none-any.whl", hash = "sha256:bb8493ebf3c416e296dae3147ded72ea6cb772a419946015f864815c6345ebc4", size = 44780 },
+]
+
+[[package]]
 name = "python-template"
 version = "0.1.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "plankapy" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "plankapy", specifier = ">=2.2.2" }]
