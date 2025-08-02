@@ -62,8 +62,16 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Run the Planka task checker
-echo "🚀 Running Planka task checker..."
-python3 main.py
+# Check if uv is installed
+if command -v uv &> /dev/null; then
+    echo "📦 Found uv package manager, ensuring dependencies are synced..."
+    uv sync
+    echo "🚀 Running Planka task checker with uv..."
+    uv run python main.py
+else
+    echo "⚠️  uv not found, falling back to python3..."
+    echo "🚀 Running Planka task checker..."
+    python3 main.py
+fi
 
 echo "✅ Planka task checker completed successfully!"
