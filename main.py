@@ -39,9 +39,12 @@ for project in planka.projects:
             # Construct card URL
             card_url = f"https://planka.midsummerred32.com/cards/{card.id}"
 
+            # Format due date for webhook payload
+            formatted_due_date = due_date.strftime("%m/%d/%Y at %I:%M %p")
+
             cards_due_today.append({
                 "taskname": card.name,
-                "due_date": card.dueDate,
+                "due_date": formatted_due_date,
                 "card_url": card_url
             })
             print(f"        *** DUE TODAY! ***")
