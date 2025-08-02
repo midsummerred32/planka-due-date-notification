@@ -3,14 +3,18 @@ import requests
 from datetime import datetime, timezone
 import json
 
-planka = Planka("https://planka.midsummerred32.com",
-                PasswordAuth("midsummerred32", "NintendoGamer08!"))
+# Load configuration
+with open('config.json', 'r') as config_file:
+    config = json.load(config_file)
+
+planka = Planka(config['planka']['url'],
+                PasswordAuth(config['planka']['username'], config['planka']['password']))
 
 print("User info:", planka.me)
 print("Projects:", planka.projects)
 
 # Home Assistant webhook URL
-webhook_url = "https://home.midsummerred32.com/api/webhook/-N9Bcq6asoHOyUpdb8mv0w1_o"
+webhook_url = f"{config['home_assistant']['url']}/api/webhook/{config['home_assistant']['webhook_id']}"
 
 # Get today's date
 today = datetime.now(timezone.utc).date()
